@@ -2,9 +2,13 @@ import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk
 import pandas as pd
+import dataCleaning as dc
+
+main_df = pd.DataFrame
 
 def start():
-    return True
+
+    dc.cleaning_data(main_df)
 
 def select_excel_file():
     excel_filepath = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx")])
