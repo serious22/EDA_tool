@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk
 import pandas as pd
-
+from sklearn.feature_selection import VarianceThreshold
 
 
 def cleaning_data(main_df):
@@ -42,3 +42,31 @@ def cleaning_data(main_df):
         label.pack()
 
         #-------Feature Selection----------
+        X = num_columns
+        variances = X.var()
+        sorted_variances = variances.sort_values(ascending=False)
+
+        features_to_keep = (len(sorted_variances) // 2) + 1  # Half + 1
+
+        top_features = sorted_variances.index[:features_to_keep] #selected on the top features
+
+        X_high_variance = X[top_features]
+        # Remove features with low variance
+        tVt = 1
+        selector = VarianceThreshold(threshold=tVt) 
+        X_filtered = selector.fit_transform(X_high_variance) #filtering if the features are still below threshold.
+
+        selected_columns = X_high_variance.columns[selector.get_support()]
+
+        X_filtered_df = pd.DataFrame(X_filtered, columns=selected_columns)
+
+        main_df_filtered = main_df.copy()
+
+        main_df_filtered = main_df_filtered.drop(columns=num_columns.columns)
+        main_df_filtered = pd.concat([main_df_filtered, X_filtered_df], axis=1)#to keep the categorical columns as well
+
+        main_df = main_df_filtered.copy()
+
+        label = tk.Label(processing_window,
+                         text = 'Important features have been selected for further processing.')
+        label.pack()
