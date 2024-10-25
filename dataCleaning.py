@@ -3,7 +3,7 @@ from tkinter import filedialog
 from tkinter import ttk
 import pandas as pd
 from sklearn.feature_selection import VarianceThreshold
-
+import dataStandardizationMODEL as ds
 
 def cleaning_data(main_df):
         processing_window = tk.Toplevel()
@@ -29,7 +29,7 @@ def cleaning_data(main_df):
             mean = round(main_df[i].mean(),0)
             main_df[i].fillna(mean, inplace=True)
 
-        threshold = 7  
+        threshold = 10  
 
         cat_columns = main_df.columns[main_df.nunique() < threshold]
         for i in cat_columns:
@@ -70,3 +70,11 @@ def cleaning_data(main_df):
         label = tk.Label(processing_window,
                          text = 'Important features have been selected for further processing.')
         label.pack()
+
+        for col in cat_columns:
+             print(f"Processing column: {col}")
+
+             main_df[col] = ds.fuzzy_grouping(main_df[col], 80)
+             top_n = ds.find_optimal_top_n(main_df[col])
+             main_df[col] = ds.standardised_set(main_df[col], top_n)
+        print(main_df['Car'].value_counts())
